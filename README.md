@@ -6,4 +6,8 @@ I first broke down the concept of flowers to simple shapes & code and then added
 
 HTML, CSS, JavaScript, three.js
 
+Screenshot:
+
+![flowers pwa screenshot](https://www.dalesmith.com/temp/flowers_screenshot.png)
+
 [View Demo](https://www.dalesmith.com/flowers)

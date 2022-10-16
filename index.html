@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>f10\/\/er5</title>
+    <style>
+      body {
+        margin: 100px 0 0 0;
+        background: #000;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="btn-container" style="display: flex">
+      <div id="add-btn" style="margin-left: 50px">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="75"
+          height="75"
+          fill="#999"
+          class="bi bi-plus"
+          viewBox="0 0 16 16"
+        >
+          <path
+            d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"
+          />
+        </svg>
+      </div>
+
+      <div id="refresh-btn" style="margin-left: 50px; margin-top: 15px">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="50"
+          height="50"
+          fill="#999"
+          class="bi bi-arrow-clockwise reload-icon"
+          viewBox="0 0 16 16"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"
+          />
+          <path
+            d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"
+          />
+        </svg>
+      </div>
+    </div>
+    <script src="js/three.js"></script>
+    <script>
+      // SCENE
+      let scene = new THREE.Scene();
+
+      // CAMERA
+      let camera = new THREE.PerspectiveCamera(
+        45,
+        window.innerWidth / window.innerHeight,
+        1,
+        500
+      );
+      camera.position.set(0, 0, 100);
+      camera.lookAt(0, 0, 0);
+
+      // RENDERER
+      let renderer = new THREE.WebGLRenderer();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
+      console.log(
+        `inner width: ${window.innerWidth}, inner height: ${window.innerHeight}`
+      );
+
+      // LINE
+      const material1 = new THREE.LineBasicMaterial({ color: 0x00f0ff });
+      const material2 = new THREE.LineBasicMaterial({ color: 0xfff0ff });
+      const material3 = new THREE.LineBasicMaterial({ color: 0xff0fff });
+      const material4 = new THREE.LineBasicMaterial({ color: 0x009245 });
+      const material5 = new THREE.LineBasicMaterial({ color: 0xffff00 });
+      const material6 = new THREE.LineBasicMaterial({ color: 0x009245 });
+
+      let stemPoints = [];
+      let bulbPoints = [];
+      let petalsPoints = [];
+      let leavesPoints = [];
+      let groundPoints = [];
+      let vasePoints = [];
+
+      let stemGeometry,
+        bulbGeometry,
+        petalsGeometry,
+        leavesGeometry,
+        groundGeometry,
+        vaseGeometry;
+
+      let stemLine, bulbLine, petalsLine, leavesLine, groundLine, vaseLine;
+
+      // RENDER
+      renderer.render(scene, camera);
+
+      let SPX_BASE = 0;
+      let SPY_BASE = 0;
+      let SPZ_BASE = 1;
+
+      let MPX_BASE = -2;
+      let MPY_BASE = 10;
+      let MPZ_BASE = 1;
+
+      let EPX_BASE = -2;
+      let EPY_BASE = 12;
+      let EPZ_BASE = 1;
+
+      let id;
+
+      function flowerGeneration(startPointX, startPointY, startPointZ, num) {
+        id = num;
+
+        mpX = MPX_BASE;
+        mpY = MPY_BASE;
+        epX = EPX_BASE + id - 6;
+        epY = EPY_BASE;
+
+        stemPoints = [];
+        bulbPoints = [];
+        petalsPoints = [];
+        leavesPoints = [];
+
+        spX = startPointX;
+        spY = startPointY;
+        spZ = startPointZ;
+
+        stemBuild(spX, spY, spZ);
+        bulbBuild();
+        petalsBuild();
+        leavesBuild();
+        groundBuild();
+        vaseBuild();
+      }
+
+      function stemBuild(spX, spY, spZ) {
+        function stemSeed(min, max, also) {
+          return Math.random() * (max - min) + min + also;
+        }
+
+        mpX += stemSeed(2, 0, 1) + spX;
+        console.log('mpX: ' + mpX);
+
+        mpY *= stemSeed(1, 0, 1) + spY;
+        console.log('mpY: ' + mpY);
+
+        epX += stemSeed(2, 0, 1) + spX;
+        console.log('epX: ' + epX);
+
+        epY *= stemSeed(1, 0, 2) + spY;
+        console.log('epY: ' + epY);
+
+        stemPoints.push(new THREE.Vector3(spX, spY, 0));
+        stemPoints.push(new THREE.Vector3(mpX, mpY, 0));
+        stemPoints.push(new THREE.Vector3(epX, epY, 0));
+
+        stemGeometry = new THREE.BufferGeometry().setFromPoints(stemPoints);
+        stemLine = new THREE.Line(stemGeometry, material1);
+        scene.add(stemLine);
+
+        console.log('firing stemBuild...');
+      }
+
+      function bulbBuild() {
+        bulbPoints.push(new THREE.Vector3(0 + epX, -1.25 + epY, 0));
+
+        bulbPoints.push(new THREE.Vector3(1 + epX, -1 + epY, 0));
+        bulbPoints.push(new THREE.Vector3(1.25 + epX, -0.5 + epY, 0));
+        bulbPoints.push(new THREE.Vector3(1.35 + epX, -0.125 + epY, 0));
+        bulbPoints.push(new THREE.Vector3(1.35 + epX, 0.125 + epY, 0));
+        bulbPoints.push(new THREE.Vector3(1.25 + epX, 0.5 + epY, 0));
+        bulbPoints.push(new THREE.Vector3(1 + epX, 1 + epY, 0));
+        bulbPoints.push(new THREE.Vector3(0 + epX, 1.25 + epY, 0));
+
+        bulbPoints.push(new THREE.Vector3(-1 + epX, 1 + epY, 0));
+        bulbPoints.push(new THREE.Vector3(-1.25 + epX, 0.5 + epY, 0));
+        bulbPoints.push(new THREE.Vector3(-1.35 + epX, 0.125 + epY, 0));
+        bulbPoints.push(new THREE.Vector3(-1.35 + epX, -0.125 + epY, 0));
+        bulbPoints.push(new THREE.Vector3(-1.25 + epX, -0.5 + epY, 0));
+        bulbPoints.push(new THREE.Vector3(-1 + epX, -1 + epY, 0));
+        bulbPoints.push(new THREE.Vector3(0 + epX, -1.25 + epY, 0));
+
+        bulbGeometry = new THREE.BufferGeometry().setFromPoints(bulbPoints);
+        bulbLine = new THREE.Line(bulbGeometry, material2);
+        scene.add(bulbLine);
+
+        console.log('firing bulbBuild...');
+      }
+
+      function petalsBuild() {
+        let petalLength = () => Math.random() * (0.99 - 0.75) + 0.75;
+        console.log(petalLength);
+
+        let a, b, r;
+
+        // RIGHT
+
+        r = petalLength();
+        console.log(r);
+        petalsPoints.push(new THREE.Vector3(0 + epX, 0 + epY, 0));
+        petalsPoints.push(new THREE.Vector3(7 * r + epX, -0.5 + epY, 0));
+        petalsPoints.push(new THREE.Vector3(8 * r + epX, 0 + epY, 0));
+        petalsPoints.push(new THREE.Vector3(7 * r + epX, 0.5 + epY, 0));
+        petalsPoints.push(new THREE.Vector3(0 + epX, 0 + epY, 0));
+
+        // LEFT
+
+        r = petalLength();
+        console.log(r);
+        petalsPoints.push(new THREE.Vector3(0 + epX, 0 + epY, 0));
+        petalsPoints.push(new THREE.Vector3(-7 * r + epX, -0.5 + epY, 0));
+        petalsPoints.push(new THREE.Vector3(-8 * r + epX, 0 + epY, 0));
+        petalsPoints.push(new THREE.Vector3(-7 * r + epX, 0.5 + epY, 0));
+        petalsPoints.push(new THREE.Vector3(0 + epX, 0 + epY, 0));
+
+        // RIGHT-DOWN
+
+        r = petalLength();
+        console.log(r);
+        a = 4;
+        b = 5;
+        petalsPoints.push(new THREE.Vector3(0 + epX, 0 + epY, 0));
+        petalsPoints.push(
+          new THREE.Vector3(9 * r + epX - a, -0.5 - b + epY, 0)
+        );
+        petalsPoints.push(new THREE.Vector3(10 * r + epX - a, 0 - b + epY, 0));
+        petalsPoints.push(new THREE.Vector3(9 * r + epX - a, 0.5 - b + epY, 0));
+        petalsPoints.push(new THREE.Vector3(0 + epX, 0 + epY, 0));
+
+        // LEFT-DOWN
+
+        r = petalLength();
+        console.log(r);
+        a = 4;
+        b = 3;
+        petalsPoints.push(new THREE.Vector3(0 + epX, 0 + epY, 0));
+        petalsPoints.push(
+          new THREE.Vector3(-9 * r + epX + a, -0.5 + epY - b, 0)
+        );
+        petalsPoints.push(new THREE.Vector3(-10 * r + epX + a, 0 + epY - b, 0));
+        petalsPoints.push(
+          new THREE.Vector3(-9 * r + epX + a, 0.5 + epY - b, 0)
+        );
+        petalsPoints.push(new THREE.Vector3(0 + epX, 0 + epY, 0));
+
+        // RIGHT-UP
+
+        r = petalLength();
+        console.log(r);
+        a = 4;
+        b = 5;
+        petalsPoints.push(new THREE.Vector3(0 + epX, 0 + epY, 0));
+        petalsPoints.push(
+          new THREE.Vector3(9 * r + epX - a, -0.5 + b + epY, 0)
+        );
+        petalsPoints.push(new THREE.Vector3(10 * r + epX - a, 0 + b + epY, 0));
+        petalsPoints.push(new THREE.Vector3(9 * r + epX - a, 0.5 + b + epY, 0));
+        petalsPoints.push(new THREE.Vector3(0 + epX, 0 + epY, 0));
+
+        // LEFT-UP
+
+        r = petalLength();
+        console.log(r);
+        a = 4;
+        b = 3;
+        petalsPoints.push(new THREE.Vector3(0 + epX, 0 + epY, 0));
+        petalsPoints.push(
+          new THREE.Vector3(-9 * r + epX + a, -0.5 + epY + b, 0)
+        );
+        petalsPoints.push(new THREE.Vector3(-10 * r + epX + a, 0 + epY + b, 0));
+        petalsPoints.push(
+          new THREE.Vector3(-9 * r + epX + a, 0.5 + epY + b, 0)
+        );
+        petalsPoints.push(new THREE.Vector3(0 + epX, 0 + epY, 0));
+
+        // DOWN
+
+        r = petalLength();
+        console.log(r);
+        a = 1;
+        b = 6;
+        petalsPoints.push(new THREE.Vector3(0 + epX, 0 + epY, 0));
+        petalsPoints.push(
+          new THREE.Vector3((epX + a - 1) * r, -0.5 + epY - b, 0)
+        );
+        petalsPoints.push(new THREE.Vector3((epX + a + 0) * r, 0 + epY - b, 0));
+        petalsPoints.push(
+          new THREE.Vector3((epX + a + 1) * r, 0.5 + epY - b, 0)
+        );
+        petalsPoints.push(new THREE.Vector3(0 + epX, 0 + epY, 0));
+
+        // UP
+
+        r = petalLength();
+        console.log(r);
+        a = 1;
+        b = 4;
+        petalsPoints.push(new THREE.Vector3(0 + epX, 0 + epY, 0));
+        petalsPoints.push(
+          new THREE.Vector3((epX + a + 1) * r, -0.5 + epY + b, 0)
+        );
+        petalsPoints.push(new THREE.Vector3((epX + a + 0) * r, 0 + epY + b, 0));
+        petalsPoints.push(
+          new THREE.Vector3((epX + a - 1) * r, 0.5 + epY + b, 0)
+        );
+        petalsPoints.push(new THREE.Vector3(0 + epX, 0 + epY, 0));
+
+        petalsGeometry = new THREE.BufferGeometry().setFromPoints(petalsPoints);
+
+        petalsLine = new THREE.Line(petalsGeometry, material3);
+
+        scene.add(petalsLine);
+
+        console.log('firing petalsBuild...');
+      }
+
+      function leavesBuild() {
+        const direction = Math.floor(Math.random() * 3);
+
+        if (direction === 1) {
+          leavesPoints.push(new THREE.Vector3(mpX, mpY, 0));
+          leavesPoints.push(new THREE.Vector3(mpX - 6, mpY + 2, 0));
+          leavesPoints.push(new THREE.Vector3(mpX - 5, mpY + 0, 0));
+          leavesPoints.push(new THREE.Vector3(mpX - 4, mpY + -0.5, 0));
+          leavesPoints.push(new THREE.Vector3(mpX - 2, mpY + -1, 0));
+          leavesPoints.push(new THREE.Vector3(mpX - 0, mpY + 0, 0));
+          leavesPoints.push(new THREE.Vector3(mpX, mpY, 0));
+        } else if (direction === 2) {
+          leavesPoints.push(new THREE.Vector3(mpX, mpY, 0));
+          leavesPoints.push(new THREE.Vector3(mpX + 6, mpY + 2, 0));
+          leavesPoints.push(new THREE.Vector3(mpX + 5, mpY + 0, 0));
+          leavesPoints.push(new THREE.Vector3(mpX + 4, mpY + -0.5, 0));
+          leavesPoints.push(new THREE.Vector3(mpX + 2, mpY + -1, 0));
+          leavesPoints.push(new THREE.Vector3(mpX + 0, mpY + 0, 0));
+          leavesPoints.push(new THREE.Vector3(mpX, mpY, 0));
+        } else {
+          console.log('no leaves');
+        }
+
+        leavesGeometry = new THREE.BufferGeometry().setFromPoints(leavesPoints);
+        leavesLine = new THREE.Line(leavesGeometry, material4);
+
+        scene.add(leavesLine);
+
+        console.log('firing leavesBuild...');
+      }
+
+      function groundBuild() {
+        groundPoints.push(new THREE.Vector3(spX - 15, spY, 0));
+        groundPoints.push(new THREE.Vector3(spX + 15, spY, 0));
+
+        groundGeometry = new THREE.BufferGeometry().setFromPoints(groundPoints);
+        groundLine = new THREE.Line(groundGeometry, material2);
+
+        scene.add(groundLine);
+
+        console.log('firing groundBuild...');
+      }
+
+      function vaseBuild() {
+        vasePoints.push(new THREE.Vector3(spX + 0, spY + 0, 0));
+
+        vasePoints.push(new THREE.Vector3(spX + 1, spY + 0, 0));
+        vasePoints.push(new THREE.Vector3(spX + 1.5, spY + 0.5, 0));
+        vasePoints.push(new THREE.Vector3(spX + 2, spY + 1, 0));
+        vasePoints.push(new THREE.Vector3(spX + 2, spY + 2, 0));
+        vasePoints.push(new THREE.Vector3(spX + 1.5, spY + 8, 0));
+        vasePoints.push(new THREE.Vector3(spX + 0, spY + 8, 0));
+        vasePoints.push(new THREE.Vector3(spX + -1.5, spY + 8, 0));
+        vasePoints.push(new THREE.Vector3(spX + -2, spY + 2, 0));
+        vasePoints.push(new THREE.Vector3(spX + -2, spY + 1, 0));
+        vasePoints.push(new THREE.Vector3(spX + -1.5, spY + 0.5, 0));
+        vasePoints.push(new THREE.Vector3(spX + -1, spY + 0, 0));
+
+        vasePoints.push(new THREE.Vector3(spX + 0, spY + 0, 0));
+
+        vaseGeometry = new THREE.BufferGeometry().setFromPoints(vasePoints);
+        vaseLine = new THREE.Line(vaseGeometry, material2);
+
+        scene.add(vaseLine);
+
+        console.log('firing vaseBuild...');
+      }
+
+      function init() {
+        for (i = 0; i < 6; i++) {
+          flowerGeneration(0, 0, 0, i * 2);
+          console.log(i + ' built!');
+          renderer.render(scene, camera);
+        }
+      }
+
+      const refreshBtn = document.getElementById('refresh-btn');
+      refreshBtn.addEventListener('click', () => {
+        while (scene.children.length > 0) {
+          scene.remove(scene.children[0]);
+        }
+        init();
+      });
+
+      const addBtn = document.getElementById('add-btn');
+      addBtn.addEventListener('click', init);
+
+      init();
+    </script>
+  </body>
+</html>
